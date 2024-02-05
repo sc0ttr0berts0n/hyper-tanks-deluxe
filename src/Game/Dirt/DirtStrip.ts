@@ -9,7 +9,7 @@ export interface ParticleStripOptions {
 
 export class DirtStrip extends Container {
     private _topSoilHeight: number;
-    public particles: Dirt[] = [];
+    public dirt: Dirt[] = [];
     constructor(opts: Partial<ParticleStripOptions>) {
         super();
         this._topSoilHeight = opts.topSoilHeight ?? World.height * 0.5;
@@ -21,12 +21,12 @@ export class DirtStrip extends Container {
         const start = World.height - this._topSoilHeight;
         const chunks = Math.floor(this._topSoilHeight / particleSize);
         for (let depth = 0; depth < chunks; depth++) {
-            const particle = new Dirt({
-                color: Dirt.getParticleColor(depth),
+            const dirt = new Dirt({
+                color: Dirt.getParticleColorByDepth(depth),
             });
-            particle.y = start + depth * particleSize;
-            this.particles.push(particle);
+            dirt.y = start + depth * particleSize;
+            this.dirt.push(dirt);
         }
-        this.addChild(...this.particles);
+        this.addChild(...this.dirt);
     }
 }

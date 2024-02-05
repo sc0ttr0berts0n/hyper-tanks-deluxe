@@ -1,9 +1,8 @@
-import Victor from 'victor';
-
 export default {
     global: {
         width: 800,
         height: 600,
+        gravity: 256, // in pixels per second, constant
     },
     ParticleStrips: {
         baseline: 0.5,
@@ -14,7 +13,7 @@ export default {
             soil: { color: 0x632b00, amount: 8 },
             deepSoil: { color: 0x311500, amount: 16 },
         },
-        particleSize: 8,
+        particleSize: 4,
     },
     localStorageController: {
         namespace: 'HyperTanksGame',

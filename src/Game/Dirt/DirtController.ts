@@ -3,12 +3,16 @@ import Singleton from '../../Utils/Singleton';
 import { DirtStrip } from './DirtStrip';
 import { World } from '../../Utils/World';
 import gameSettings from '../../game.settings';
+import { EDirtType as EDirtType } from './Dirt';
+import anime from 'animejs';
+import { wait } from '../../Utils/Wait';
 
 class DirtController extends Singleton<DirtController>() {
     public view = new Container();
+    public interactive = true;
     private _strips: DirtStrip[] = [];
     public get particles() {
-        return this._strips.map((strip) => strip.particles).flat();
+        return this._strips.map((strip) => strip.dirt).flat();
     }
 
     init() {
@@ -26,27 +30,108 @@ class DirtController extends Singleton<DirtController>() {
         }
     }
 
-    destroyParticlesInRadius(x: number, y: number, radius: number) {
+    async destroyDirtInRadius(
+        x: number,
+        y: number,
+        radius: number,
+        settleDelay: number = 0
+    ) {
+        this.interactive = false;
         const circle = new Circle(x, y, radius);
         const halfParticle = gameSettings.ParticleStrips.particleSize / 2;
         for (let strip of this._strips) {
             const x = strip.x + halfParticle;
-            for (let i = strip.particles.length - 1; i >= 0; i--) {
-                const particle = strip.particles[i];
+            for (let i = strip.dirt.length - 1; i >= 0; i--) {
+                const particle = strip.dirt[i];
                 if (!particle) debugger;
                 const y = particle.y + halfParticle;
                 if (circle.contains(x, y)) {
-                    this.removeParticleAt(strip, i);
+                    this.convertDirtAt(strip, i, EDirtType.AIR);
                 }
             }
         }
+        await wait(settleDelay);
+        await this.settleDirt();
+        this.interactive = true;
     }
 
-    removeParticleAt(stripX: DirtStrip | number, indexY: number) {
+    convertDirtAt(stripX: DirtStrip | number, indexY: number, type: EDirtType) {
         const strip =
             typeof stripX === 'number' ? this._strips[stripX] : stripX;
-        strip.particles[indexY].destroy();
-        strip.particles.splice(indexY, 1);
+        strip.dirt[indexY].type = type;
+    }
+
+    removeDirtRange(
+        stripX: DirtStrip | number,
+        startY: number,
+        deleteCount: number
+    ) {
+        const strip =
+            typeof stripX === 'number' ? this._strips[stripX] : stripX;
+        const removals = strip.dirt.splice(startY, deleteCount);
+        removals.forEach((dirt) => dirt.destroy());
+    }
+
+    removeDirtAt(stripX: DirtStrip | number, indexY: number) {
+        this.removeDirtRange(stripX, indexY, 1);
+    }
+
+    async settleDirt() {
+        const promises: Promise<void>[] = [];
+        for (let strip of this._strips) {
+            // detect an air gap
+            let lowestAir = -1;
+            let nextDirt = -1;
+
+            for (let i = strip.dirt.length - 1; i >= 0; i--) {
+                const dirt = strip.dirt[i];
+                if (lowestAir < 0) {
+                    if (dirt.type === EDirtType.AIR) {
+                        lowestAir = i;
+                    }
+                } else {
+                    if (dirt.type === EDirtType.NORMAL) {
+                        nextDirt = i;
+                        break;
+                    }
+                }
+            }
+
+            // if there is an air gap
+            if (lowestAir < 0 || nextDirt < 0) continue;
+
+            // remove air dirt particles
+            const dist = lowestAir - nextDirt + 1;
+            this.removeDirtRange(strip, nextDirt + 1, dist);
+
+            // animate dirt down to new position
+            const { particleSize } = gameSettings.ParticleStrips;
+            const { gravity } = gameSettings.global;
+            strip.dirt.slice(0, nextDirt + 1).forEach((dirt) => {
+                const duration = (particleSize / gravity) * 1000 * dist;
+                const obj = {
+                    y: dirt.y,
+                };
+                promises.push(
+                    new Promise((resolve) => {
+                        anime({
+                            targets: obj,
+                            duration,
+                            easing: 'easeInQuad',
+                            y: obj.y + dist * particleSize,
+                            update: () => {
+                                dirt.y = obj.y;
+                            },
+                            complete: () => {
+                                resolve();
+                            },
+                        });
+                    })
+                );
+            });
+        }
+
+        await Promise.allSettled(promises);
     }
 }
 

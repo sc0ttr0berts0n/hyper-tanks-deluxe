@@ -17,18 +17,14 @@ export class PlayArea extends Container {
         DirtController.init();
         this.addChild(DirtController.view);
         this.eventMode = 'static';
-        this.addEventListener('pointerup', (e) => {
-            const radius = Math.floor(Math.random() * 16) * 8;
+        this.addEventListener('pointerup', async (e) => {
+            if (!DirtController.interactive) return;
+            const radius = Math.floor(Math.random() * 8) * 16;
             const explosion = new Explosion({
                 pos: new Victor(e.screenX, e.screenY),
                 radius,
             });
             this.addChild(explosion);
-            DirtController.destroyParticlesInRadius(
-                e.screenX,
-                e.screenY,
-                radius
-            );
         });
     }
 }
