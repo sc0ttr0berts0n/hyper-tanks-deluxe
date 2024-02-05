@@ -1,13 +1,13 @@
-import { Container, Graphics } from 'pixi.js';
+import { Graphics } from 'pixi.js';
 import gameSettings from '../../game.settings';
 
-interface ParticleOptions {
+interface DirtOptions {
     color: number;
 }
-export class Particle extends Graphics {
+export class Dirt extends Graphics {
     public removalFlag = false;
 
-    constructor(opts: Partial<ParticleOptions>) {
+    constructor(opts: Partial<DirtOptions>) {
         super();
         const { particleSize } = gameSettings.ParticleStrips;
         this.beginFill(opts?.color ?? 0xffffff)

@@ -1,5 +1,5 @@
 import { Container, Graphics } from 'pixi.js';
-import ParticleController from './Particles/ParticleController';
+import DirtController from './Dirt/DirtController';
 import { Explosion } from './Explosion';
 import Victor from 'victor';
 import { World } from '../Utils/World';
@@ -14,8 +14,8 @@ export class PlayArea extends Container {
         super();
         Objects.set('PlayArea', this);
         this.addChild(this._gfx_background);
-        ParticleController.init();
-        this.addChild(ParticleController.view);
+        DirtController.init();
+        this.addChild(DirtController.view);
         this.eventMode = 'static';
         this.addEventListener('pointerup', (e) => {
             const radius = Math.floor(Math.random() * 16) * 8;
@@ -24,7 +24,7 @@ export class PlayArea extends Container {
                 radius,
             });
             this.addChild(explosion);
-            ParticleController.destroyParticlesInRadius(
+            DirtController.destroyParticlesInRadius(
                 e.screenX,
                 e.screenY,
                 radius

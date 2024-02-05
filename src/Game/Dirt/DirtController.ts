@@ -1,12 +1,12 @@
 import { Circle, Container } from 'pixi.js';
 import Singleton from '../../Utils/Singleton';
-import { ParticleStrip } from './ParticleStrip';
+import { DirtStrip } from './DirtStrip';
 import { World } from '../../Utils/World';
 import gameSettings from '../../game.settings';
 
-class ParticleController extends Singleton<ParticleController>() {
+class DirtController extends Singleton<DirtController>() {
     public view = new Container();
-    private _strips: ParticleStrip[] = [];
+    private _strips: DirtStrip[] = [];
     public get particles() {
         return this._strips.map((strip) => strip.particles).flat();
     }
@@ -20,7 +20,7 @@ class ParticleController extends Singleton<ParticleController>() {
         // build strips
         for (let i = 0; i < World.width; i = i + particleSize) {
             const topSoilHeight = World.height * baseline;
-            const ps = this.view.addChild(new ParticleStrip({ topSoilHeight }));
+            const ps = this.view.addChild(new DirtStrip({ topSoilHeight }));
             this._strips.push(ps);
             ps.x = i;
         }
@@ -42,7 +42,7 @@ class ParticleController extends Singleton<ParticleController>() {
         }
     }
 
-    removeParticleAt(stripX: ParticleStrip | number, indexY: number) {
+    removeParticleAt(stripX: DirtStrip | number, indexY: number) {
         const strip =
             typeof stripX === 'number' ? this._strips[stripX] : stripX;
         strip.particles[indexY].destroy();
@@ -50,4 +50,4 @@ class ParticleController extends Singleton<ParticleController>() {
     }
 }
 
-export default ParticleController.getInstance();
+export default DirtController.getInstance();
