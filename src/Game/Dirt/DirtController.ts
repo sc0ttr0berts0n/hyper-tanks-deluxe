@@ -108,7 +108,9 @@ class DirtController extends Singleton<DirtController>() {
             const { particleSize } = gameSettings.ParticleStrips;
             const { gravity } = gameSettings.global;
             strip.dirt.slice(0, nextDirt + 1).forEach((dirt) => {
-                const duration = (particleSize / gravity) * 1000 * dist;
+                // const duration = (particleSize / gravity) * 1000 * dist;
+                const duration =
+                    Math.sqrt((2 * (dist * particleSize)) / gravity) * 1000;
                 const obj = {
                     y: dirt.y,
                 };
