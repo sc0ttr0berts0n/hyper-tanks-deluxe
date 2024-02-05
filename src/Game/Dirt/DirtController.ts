@@ -6,6 +6,7 @@ import gameSettings from '../../game.settings';
 import { EDirtType as EDirtType } from './Dirt';
 import anime from 'animejs';
 import { wait } from '../../Utils/Wait';
+import { createNoise2D } from 'simplex-noise';
 
 class DirtController extends Singleton<DirtController>() {
     public view = new Container();
@@ -16,17 +17,23 @@ class DirtController extends Singleton<DirtController>() {
     }
 
     init() {
-        const { particleSize, baseline } = gameSettings.ParticleStrips;
+        const { particleSize, baseline, wiggle } = gameSettings.ParticleStrips;
 
         // name the view
         this.view.name = 'ParticleContainerView';
 
         // build strips
+        const noise2d = createNoise2D();
+
         for (let i = 0; i < World.width; i = i + particleSize) {
-            const topSoilHeight = World.height * baseline;
-            const ps = this.view.addChild(new DirtStrip({ topSoilHeight }));
-            this._strips.push(ps);
-            ps.x = i;
+            const noise = noise2d(i / 400, 0);
+            const offset = World.height * wiggle * noise;
+            const topSoilHeight = World.height * baseline + offset;
+            const dirtStrip = this.view.addChild(
+                new DirtStrip({ topSoilHeight })
+            );
+            this._strips.push(dirtStrip);
+            dirtStrip.x = i;
         }
     }
 

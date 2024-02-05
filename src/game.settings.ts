@@ -6,7 +6,7 @@ export default {
     },
     ParticleStrips: {
         baseline: 0.5,
-        wiggle: 0.5,
+        wiggle: 0.05,
         soil: {
             grass: { color: 0x50ff50, amount: 1 },
             topSoil: { color: 0xcd8500, amount: 4 },
