@@ -4,6 +4,7 @@ import { Explosion } from './Explosion';
 import Victor from 'victor';
 import { World } from '../Utils/World';
 import Objects from '../Utils/Objects';
+import { Tank } from './Tank/Tank';
 
 export class PlayArea extends Container {
     private _gfx_background = new Graphics()
@@ -17,6 +18,7 @@ export class PlayArea extends Container {
         DirtController.init();
         this.addChild(DirtController.view);
         this.eventMode = 'static';
+        this.addChild(new Tank({ color: 0xff5050 }));
         this.addEventListener('pointerup', async (e) => {
             if (!DirtController.interactive) return;
             const radius = Math.floor(Math.random() * 8) * 16;

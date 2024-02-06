@@ -7,6 +7,7 @@ import { EDirtType as EDirtType } from './Dirt';
 import anime from 'animejs';
 import { wait } from '../../Utils/Wait';
 import { createNoise2D } from 'simplex-noise';
+import Victor from 'victor';
 
 class DirtController extends Singleton<DirtController>() {
     public view = new Container();
@@ -141,6 +142,12 @@ class DirtController extends Singleton<DirtController>() {
         }
 
         await Promise.allSettled(promises);
+    }
+
+    surfacePositionAt(x: number) {
+        const index = Math.floor(x / gameSettings.ParticleStrips.particleSize);
+        const targetDirt = this._strips[index].dirt[0];
+        return new Victor(x, targetDirt.y);
     }
 }
 

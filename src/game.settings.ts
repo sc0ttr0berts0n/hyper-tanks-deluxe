@@ -1,3 +1,5 @@
+import Victor from 'victor';
+
 export default {
     global: {
         width: 800,
@@ -14,6 +16,10 @@ export default {
             deepSoil: { color: 0x311500, amount: 16 },
         },
         particleSize: 4,
+    },
+    tank: {
+        playerStartPos: 0.2, // as a float across the whole width
+        size: new Victor(40, 20),
     },
     localStorageController: {
         namespace: 'HyperTanksGame',
