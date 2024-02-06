@@ -1,10 +1,8 @@
 import { Container, Graphics } from 'pixi.js';
 import { Turret } from './Turret';
 import Victor from 'victor';
-import { World } from '../../Utils/World';
 import gameSettings from '../../game.settings';
 import DirtController from '../Dirt/DirtController';
-import Game from '../Game';
 
 export interface TankOptions {
     startPos: number;
