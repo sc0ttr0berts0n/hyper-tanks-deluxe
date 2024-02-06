@@ -4,8 +4,9 @@ import Victor from 'victor';
 import { World } from '../../Utils/World';
 import gameSettings from '../../game.settings';
 import DirtController from '../Dirt/DirtController';
+import Game from '../Game';
 
-interface TankOptions {
+export interface TankOptions {
     startPos: number;
     color: number;
     size: Victor;
@@ -18,7 +19,7 @@ const tankDefaultOptions = {
 };
 
 export class Tank extends Container {
-    private _turret = new Turret();
+    private _turret: Turret | null = null;
     private _gfx_body = new Graphics();
     private _opts: TankOptions;
     constructor(opts?: Partial<TankOptions>) {
@@ -38,7 +39,11 @@ export class Tank extends Container {
         const startPos = DirtController.surfacePositionAt(this._opts.startPos);
         this.position.set(startPos.x, startPos.y);
 
-        // calc angle
+        // place turret
+        this._turret = this.addChild(new Turret(this, this._opts));
+        this._turret.y = -this._gfx_body.height;
+
+        // calc body angle
         const leftX = startPos.x - this._gfx_body.width / 2;
         const rightX = startPos.x + this._gfx_body.width / 2;
         const leftPos = DirtController.surfacePositionAt(leftX);
@@ -48,6 +53,5 @@ export class Tank extends Container {
 
         this._gfx_body.angle = angle;
         this.addChild(this._gfx_body);
-        this.addChild(this._turret);
     }
 }

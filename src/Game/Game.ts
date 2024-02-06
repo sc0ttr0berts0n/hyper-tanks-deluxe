@@ -2,6 +2,7 @@ import { Application } from 'pixi.js';
 import Objects from '../Utils/Objects';
 import Singleton from '../Utils/Singleton';
 import { PlayArea } from './PlayArea';
+import MouseManager from './Managers/MouseManager';
 
 class Game extends Singleton<Game>() {
     public app: Application | undefined;
@@ -31,6 +32,7 @@ class Game extends Singleton<Game>() {
     async create() {
         // await GraphicController.init();
         this.playArea = this.app?.stage.addChild(new PlayArea());
+        MouseManager.init();
     }
 }
 
