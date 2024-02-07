@@ -3,11 +3,16 @@ import Objects from '../../Utils/Objects';
 import Singleton from '../../Utils/Singleton';
 import { Tank } from './Tank';
 import { Projectile } from '../Projectile/Projectile';
+import anime from 'animejs';
+import MathHelper from '../../Utils/MathHelper';
 
 class TankController extends Singleton<TankController>() {
     public power = 60;
     public get tank() {
         return Objects.get<Tank>('Tank');
+    }
+    public get hitBox() {
+        return Objects.get<Tank>('Tank').body;
     }
     public get angle(): number {
         return this.tank?.turret?.angle ?? 0;
@@ -41,6 +46,34 @@ class TankController extends Singleton<TankController>() {
             startPos,
         });
         await projectile.complete;
+    }
+
+    moveTo(pos: Victor): Promise<void> {
+        const obj = {
+            x: this.tank.x,
+            y: this.tank.y,
+            angle: this.tank.angle,
+        };
+        const dist = Math.abs(this.tank.y - pos.y);
+        const duration = 300 ?? MathHelper.freeFallDuration(dist);
+        const angle = this.tank.getSlopeBeneathTank();
+        return new Promise((resolve) => {
+            anime({
+                targets: obj,
+                duration,
+                easing: 'easeInQuad',
+                y: pos.y,
+                angle,
+                update: () => {
+                    this.tank.x = obj.x;
+                    this.tank.y = obj.y;
+                    this.tank.body.angle = obj.angle;
+                },
+                complete: () => {
+                    resolve();
+                },
+            });
+        });
     }
 }
 

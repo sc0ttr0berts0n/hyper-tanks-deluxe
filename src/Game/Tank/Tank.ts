@@ -21,6 +21,9 @@ const tankDefaultOptions = {
 export class Tank extends Container {
     public turret: Turret | null = null;
     private _gfx_body = new Graphics();
+    public get body() {
+        return this._gfx_body;
+    }
     private _opts: TankOptions;
     constructor(opts?: Partial<TankOptions>) {
         super();

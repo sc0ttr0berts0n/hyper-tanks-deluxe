@@ -8,6 +8,7 @@ import anime from 'animejs';
 import { wait } from '../../Utils/Wait';
 import { createNoise2D } from 'simplex-noise';
 import Victor from 'victor';
+import TankController from '../Tank/TankController';
 
 class DirtController extends Singleton<DirtController>() {
     public view = new Container();
@@ -49,6 +50,8 @@ class DirtController extends Singleton<DirtController>() {
         const halfParticle = gameSettings.dirt.size / 2;
         for (let strip of this._strips) {
             const x = strip.x + halfParticle;
+
+            // convert dirt to air
             for (let i = strip.dirt.length - 1; i >= 0; i--) {
                 const particle = strip.dirt[i];
                 const y = particle.y + halfParticle;
@@ -85,6 +88,10 @@ class DirtController extends Singleton<DirtController>() {
 
     async settleDirt() {
         const promises: Promise<void>[] = [];
+
+        let tankIsFloating = false;
+        const tankBounds = TankController.hitBox.getBounds();
+
         for (let strip of this._strips) {
             // detect an air gap
             let lowestAir = -1;
@@ -104,7 +111,17 @@ class DirtController extends Singleton<DirtController>() {
                 }
             }
 
-            // if there is an air gap
+            // check if tank affected, and if so, drop it
+            if (
+                tankBounds.left < strip.x &&
+                tankBounds.right > strip.x &&
+                strip.dirt[0].type === EDirtType.AIR
+            ) {
+                const surfacePos = this.surfacePositionAt(strip.x);
+                TankController.moveTo(surfacePos);
+            }
+
+            // if there is no air gap, continue
             if (lowestAir < 0 || nextDirt < 0) continue;
 
             // remove air dirt particles
@@ -145,8 +162,10 @@ class DirtController extends Singleton<DirtController>() {
 
     surfacePositionAt(x: number) {
         const index = Math.floor(x / gameSettings.dirt.size);
-        const targetDirt = this._strips[index].dirt[0];
-        return new Victor(x, targetDirt.y);
+        const targetDirt = this._strips[index].dirt.find((dirt) => {
+            return dirt.type !== EDirtType.AIR;
+        });
+        return new Victor(x, targetDirt?.y ?? World.height);
     }
 }
 
