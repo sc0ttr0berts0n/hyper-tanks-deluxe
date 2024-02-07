@@ -19,18 +19,19 @@ class MouseManager extends Singleton<MouseManager>() {
 
     onKeydown(e: KeyboardEvent) {
         this.pressedKeys.add(e.key);
+        const amount = e.shiftKey ? 10 : 1;
         switch (e.key) {
             case 'ArrowUp':
-                TankController.power++;
+                TankController.power += amount;
                 break;
             case 'ArrowDown':
-                TankController.power--;
+                TankController.power -= amount;
                 break;
             case 'ArrowLeft':
-                TankController.angle--;
+                TankController.angle -= amount;
                 break;
             case 'ArrowRight':
-                TankController.angle++;
+                TankController.angle += amount;
                 break;
             case ' ':
                 TankController.fire();

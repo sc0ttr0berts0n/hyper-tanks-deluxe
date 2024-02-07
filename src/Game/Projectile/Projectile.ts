@@ -19,7 +19,7 @@ export interface ProjectileOptions {
 }
 
 const defaults = {
-    powerScale: 0.4,
+    powerScale: 0.2,
     hitboxRadius: gameSettings.dirt.size * 2,
     radius: gameSettings.dirt.size * 2,
 };

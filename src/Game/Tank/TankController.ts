@@ -5,7 +5,7 @@ import { Tank } from './Tank';
 import { Projectile } from '../Projectile/Projectile';
 
 class TankController extends Singleton<TankController>() {
-    public power = 20;
+    public power = 60;
     public get tank() {
         return Objects.get<Tank>('Tank');
     }

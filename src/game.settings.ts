@@ -4,7 +4,7 @@ export default {
     global: {
         width: 800,
         height: 600,
-        gravity: new Victor(0, 0.98),
+        gravity: new Victor(0, 0.2),
     },
     dirt: {
         baseline: 0.5,

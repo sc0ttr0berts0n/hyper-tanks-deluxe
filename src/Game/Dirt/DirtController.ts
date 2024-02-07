@@ -51,7 +51,6 @@ class DirtController extends Singleton<DirtController>() {
             const x = strip.x + halfParticle;
             for (let i = strip.dirt.length - 1; i >= 0; i--) {
                 const particle = strip.dirt[i];
-                if (!particle) debugger;
                 const y = particle.y + halfParticle;
                 if (circle.contains(x, y)) {
                     this.convertDirtAt(strip, i, EDirtType.AIR);
