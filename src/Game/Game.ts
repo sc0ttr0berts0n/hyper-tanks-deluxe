@@ -3,12 +3,16 @@ import Objects from '../Utils/Objects';
 import Singleton from '../Utils/Singleton';
 import { PlayArea } from './PlayArea';
 import MouseManager from './Managers/MouseManager';
+import TankController from './Tank/TankController';
+import { UI } from './UI/UI';
+import KeyboardManager from './Managers/KeyboardManager';
 
 class Game extends Singleton<Game>() {
     public app: Application | undefined;
     public gameover = false;
     public playArea: PlayArea | undefined;
     public frames = 0;
+    public ui: UI | undefined;
 
     constructor() {
         super();
@@ -32,7 +36,10 @@ class Game extends Singleton<Game>() {
     async create() {
         // await GraphicController.init();
         this.playArea = this.app?.stage.addChild(new PlayArea());
+        this.ui = this.app?.stage.addChild(new UI());
         MouseManager.init();
+        KeyboardManager.init();
+        TankController.init();
     }
 }
 

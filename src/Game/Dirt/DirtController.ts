@@ -13,12 +13,12 @@ class DirtController extends Singleton<DirtController>() {
     public view = new Container();
     public interactive = true;
     private _strips: DirtStrip[] = [];
-    public get particles() {
+    public get dirt() {
         return this._strips.map((strip) => strip.dirt).flat();
     }
 
     init() {
-        const { particleSize, baseline, wiggle } = gameSettings.ParticleStrips;
+        const { size: particleSize, baseline, wiggle } = gameSettings.dirt;
 
         // name the view
         this.view.name = 'ParticleContainerView';
@@ -46,7 +46,7 @@ class DirtController extends Singleton<DirtController>() {
     ) {
         this.interactive = false;
         const circle = new Circle(x, y, radius);
-        const halfParticle = gameSettings.ParticleStrips.particleSize / 2;
+        const halfParticle = gameSettings.dirt.size / 2;
         for (let strip of this._strips) {
             const x = strip.x + halfParticle;
             for (let i = strip.dirt.length - 1; i >= 0; i--) {
@@ -113,8 +113,8 @@ class DirtController extends Singleton<DirtController>() {
             this.removeDirtRange(strip, nextDirt + 1, dist);
 
             // animate dirt down to new position
-            const { particleSize } = gameSettings.ParticleStrips;
-            const { gravity } = gameSettings.global;
+            const { size: particleSize } = gameSettings.dirt;
+            const { gravity } = gameSettings.dirt;
             strip.dirt.slice(0, nextDirt + 1).forEach((dirt) => {
                 // const duration = (particleSize / gravity) * 1000 * dist;
                 const duration =
@@ -145,7 +145,7 @@ class DirtController extends Singleton<DirtController>() {
     }
 
     surfacePositionAt(x: number) {
-        const index = Math.floor(x / gameSettings.ParticleStrips.particleSize);
+        const index = Math.floor(x / gameSettings.dirt.size);
         const targetDirt = this._strips[index].dirt[0];
         return new Victor(x, targetDirt.y);
     }

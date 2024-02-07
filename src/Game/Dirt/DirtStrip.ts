@@ -17,7 +17,7 @@ export class DirtStrip extends Container {
     }
 
     create() {
-        const { particleSize } = gameSettings.ParticleStrips;
+        const { size: particleSize } = gameSettings.dirt;
         const start = World.height - this._topSoilHeight;
         const chunks = Math.floor(this._topSoilHeight / particleSize);
         for (let depth = 0; depth < chunks; depth++) {

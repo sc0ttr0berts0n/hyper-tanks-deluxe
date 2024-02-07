@@ -3,6 +3,8 @@ import { Turret } from './Turret';
 import Victor from 'victor';
 import gameSettings from '../../game.settings';
 import DirtController from '../Dirt/DirtController';
+import { Reticle } from './Reticle';
+import Objects from '../../Utils/Objects';
 
 export interface TankOptions {
     startPos: number;
@@ -17,11 +19,12 @@ const tankDefaultOptions = {
 };
 
 export class Tank extends Container {
-    private _turret: Turret | null = null;
+    public turret: Turret | null = null;
     private _gfx_body = new Graphics();
     private _opts: TankOptions;
     constructor(opts?: Partial<TankOptions>) {
         super();
+        Objects.set('Tank', this);
         this._opts = Object.assign(tankDefaultOptions, opts);
         this.create();
     }
@@ -38,8 +41,11 @@ export class Tank extends Container {
         this.position.set(startPos.x, startPos.y);
 
         // place turret
-        this._turret = this.addChild(new Turret(this, this._opts));
-        this._turret.y = -this._gfx_body.height;
+        this.turret = this.addChild(new Turret(this, this._opts));
+        this.turret.y = -this._gfx_body.height * 0.8;
+
+        // place retricle
+        this.turret.addChild(new Reticle(this));
 
         // calc body angle
         const leftX = startPos.x - this._gfx_body.width / 2;

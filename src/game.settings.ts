@@ -4,9 +4,9 @@ export default {
     global: {
         width: 800,
         height: 600,
-        gravity: 256, // in pixels per second, constant
+        gravity: new Victor(0, 0.98),
     },
-    ParticleStrips: {
+    dirt: {
         baseline: 0.5,
         wiggle: 0.05,
         soil: {
@@ -15,7 +15,8 @@ export default {
             soil: { color: 0x632b00, amount: 8 },
             deepSoil: { color: 0x311500, amount: 16 },
         },
-        particleSize: 4,
+        size: 4,
+        gravity: 256, // in pixels per second, constant
     },
     tank: {
         playerStartPos: 0.2, // as a float across the whole width

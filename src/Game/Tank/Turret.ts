@@ -5,18 +5,27 @@ import MouseManager from '../Managers/MouseManager';
 import Game from '../Game';
 export class Turret extends Graphics {
     private _parentRef: Tank;
+    public gunAngle = 0;
     constructor(parentRef: Tank, opts: TankOptions) {
         super();
         this._parentRef = parentRef;
         this.beginFill(opts.color)
-            .drawRect(0, 0, opts.size.x * 0.666, opts.size.y * 0.333)
+            .drawRoundedRect(
+                0,
+                -(opts.size.y * 0.333) / 2,
+                opts.size.x * 0.666,
+                opts.size.y * 0.333,
+                100
+            )
             .endFill();
-        this.pivot.y = this.height / 2;
 
-        Game.app?.ticker.add(this.update.bind(this));
+        MouseManager.addEventListener(
+            'mousemove',
+            this.alignTurretWithMouse.bind(this)
+        );
     }
 
-    update() {
+    alignTurretWithMouse() {
         const turretPos = this.getGlobalPosition();
         const angle = MouseManager.pos
             .clone()

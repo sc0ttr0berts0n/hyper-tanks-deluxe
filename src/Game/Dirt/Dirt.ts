@@ -48,17 +48,15 @@ export class Dirt extends Graphics {
     }
 
     draw() {
-        const { particleSize } = gameSettings.ParticleStrips;
+        const { size: particleSize } = gameSettings.dirt;
         this.beginFill(this._color)
             .drawRect(0, 0, particleSize, particleSize)
             .endFill();
     }
 
     static getParticleColorByDepth(depth: number) {
-        const { soil } = gameSettings.ParticleStrips;
-        const _convertToRanges = (
-            soil: typeof gameSettings.ParticleStrips.soil
-        ) => {
+        const { soil } = gameSettings.dirt;
+        const _convertToRanges = (soil: typeof gameSettings.dirt.soil) => {
             let base = 0;
             return Object.entries(soil).map(([key, value]) => {
                 const result = {
