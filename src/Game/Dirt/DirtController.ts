@@ -89,9 +89,6 @@ class DirtController extends Singleton<DirtController>() {
     async settleDirt() {
         const promises: Promise<void>[] = [];
 
-        let tankIsFloating = false;
-        const tankBounds = TankController.hitBox.getBounds();
-
         for (let strip of this._strips) {
             // detect an air gap
             let lowestAir = -1;
@@ -111,50 +108,58 @@ class DirtController extends Singleton<DirtController>() {
                 }
             }
 
-            // check if tank affected, and if so, drop it
-            if (
-                tankBounds.left < strip.x &&
-                tankBounds.right > strip.x &&
-                strip.dirt[0].type === EDirtType.AIR
-            ) {
-                const surfacePos = this.surfacePositionAt(strip.x);
-                TankController.moveTo(surfacePos);
+            // if there is an air gap
+            if (lowestAir >= 0 && nextDirt >= 0) {
+                // animate dirt down to new position
+                const dist = lowestAir - nextDirt + 1;
+                const { size: particleSize } = gameSettings.dirt;
+                const { gravity } = gameSettings.dirt;
+                promises.push(
+                    ...strip.dirt
+                        .slice(0, nextDirt + 1)
+                        .map((dirt): Promise<void> => {
+                            const duration =
+                                Math.sqrt(
+                                    (2 * (dist * particleSize)) / gravity
+                                ) * 1000;
+                            const obj = {
+                                y: dirt.y,
+                            };
+                            return new Promise((resolve) => {
+                                anime({
+                                    targets: obj,
+                                    duration,
+                                    easing: 'easeInQuad',
+                                    y: obj.y + dist * particleSize,
+                                    update: () => {
+                                        dirt.y = obj.y;
+                                    },
+                                    complete: () => {
+                                        resolve();
+                                    },
+                                });
+                            });
+                        })
+                );
+
+                // remove air dirt particles
+                this.removeDirtRange(strip, nextDirt + 1, dist);
+                continue;
             }
 
-            // if there is no air gap, continue
-            if (lowestAir < 0 || nextDirt < 0) continue;
+            if (lowestAir >= 0) {
+                this.removeDirtRange(strip, 0, lowestAir + 1);
+            }
 
-            // remove air dirt particles
-            const dist = lowestAir - nextDirt + 1;
-            this.removeDirtRange(strip, nextDirt + 1, dist);
-
-            // animate dirt down to new position
-            const { size: particleSize } = gameSettings.dirt;
-            const { gravity } = gameSettings.dirt;
-            strip.dirt.slice(0, nextDirt + 1).forEach((dirt) => {
-                // const duration = (particleSize / gravity) * 1000 * dist;
-                const duration =
-                    Math.sqrt((2 * (dist * particleSize)) / gravity) * 1000;
-                const obj = {
-                    y: dirt.y,
-                };
-                promises.push(
-                    new Promise((resolve) => {
-                        anime({
-                            targets: obj,
-                            duration,
-                            easing: 'easeInQuad',
-                            y: obj.y + dist * particleSize,
-                            update: () => {
-                                dirt.y = obj.y;
-                            },
-                            complete: () => {
-                                resolve();
-                            },
-                        });
-                    })
-                );
-            });
+            const tankPos = TankController.tank.body.getGlobalPosition();
+            if (strip === this.stripAtPixel(tankPos.x)) {
+                const highestDirt = Math.min(...strip.dirt.map((el) => el.y));
+                if (tankPos.y < highestDirt - gameSettings.dirt.size) {
+                    TankController.fallTo(
+                        strip.dirt?.[0]?.position ?? { y: World.height }
+                    );
+                }
+            }
         }
 
         await Promise.allSettled(promises);
@@ -166,6 +171,14 @@ class DirtController extends Singleton<DirtController>() {
             return dirt.type !== EDirtType.AIR;
         });
         return new Victor(x, targetDirt?.y ?? World.height);
+    }
+
+    /**
+     * @param x value in pixels
+     * @returns strip at that absolute pixel value
+     */
+    private stripAtPixel(x: number) {
+        return this._strips[Math.floor(x / gameSettings.dirt.size)];
     }
 }
 

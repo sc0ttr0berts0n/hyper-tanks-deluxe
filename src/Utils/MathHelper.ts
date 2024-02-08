@@ -8,7 +8,7 @@ export default class MathHelper {
         // TODO: remove this constant
         const FPS = 60;
         return (
-            Math.sqrt(((2 * dist) / gameSettings.global.gravity.y) * FPS) * 1000
+            (Math.sqrt((2 * dist) / gameSettings.global.gravity.y) * 1000) / FPS
         );
     };
 }

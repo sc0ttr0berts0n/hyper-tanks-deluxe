@@ -5,6 +5,8 @@ import { Tank } from './Tank';
 import { Projectile } from '../Projectile/Projectile';
 import anime from 'animejs';
 import MathHelper from '../../Utils/MathHelper';
+import gameSettings from '../../game.settings';
+import { Point } from 'pixi.js';
 
 class TankController extends Singleton<TankController>() {
     public power = 60;
@@ -48,14 +50,14 @@ class TankController extends Singleton<TankController>() {
         await projectile.complete;
     }
 
-    moveTo(pos: Victor): Promise<void> {
+    fallTo(pos: Victor | Point): Promise<void> {
         const obj = {
-            x: this.tank.x,
-            y: this.tank.y,
+            x: this.tank.x + gameSettings.dirt.size,
+            y: this.tank.y + gameSettings.dirt.size,
             angle: this.tank.angle,
         };
         const dist = Math.abs(this.tank.y - pos.y);
-        const duration = 300 ?? MathHelper.freeFallDuration(dist);
+        const duration = MathHelper.freeFallDuration(dist);
         const angle = this.tank.getSlopeBeneathTank();
         return new Promise((resolve) => {
             anime({
