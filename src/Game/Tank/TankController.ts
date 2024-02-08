@@ -7,6 +7,7 @@ import anime from 'animejs';
 import MathHelper from '../../Utils/MathHelper';
 import gameSettings from '../../game.settings';
 import { Point } from 'pixi.js';
+import DirtController from '../Dirt/DirtController';
 
 class TankController extends Singleton<TankController>() {
     public power = 60;
@@ -50,10 +51,53 @@ class TankController extends Singleton<TankController>() {
         await projectile.complete;
     }
 
+    async moveTo(direction: 'left' | 'right'): Promise<void> {
+        const _dir = direction === 'left' ? -1 : 1;
+        return new Promise((resolve) => {
+            let frameCount = 0;
+            const maxClimb = -_dir * gameSettings.tank.maxClimb;
+            const obj = {
+                x: this.tank.x,
+            };
+
+            anime({
+                targets: obj,
+                duration: gameSettings.tank.moveDistance * 15,
+                easing: 'easeInOutQuad',
+                x: this.tank.x + gameSettings.tank.moveDistance * _dir,
+                update: (e) => {
+                    this.tank.y = DirtController.surfacePositionAt(
+                        this.tank.x
+                    ).y;
+                    const angle = this.tank.getSlopeBeneathTank();
+                    console.log(angle);
+
+                    if (
+                        (direction === 'right' && angle > maxClimb) ||
+                        (direction === 'left' && angle < maxClimb)
+                    ) {
+                        this.tank.x = obj.x;
+                    }
+
+                    const wiggle = Math.sin(e.progress / 4) * 3;
+                    this.tank.body.angle =
+                        this.tank.getSlopeBeneathTank() + wiggle;
+
+                    frameCount++;
+                },
+                complete: () => {
+                    this.tank.body.angle = this.tank.getSlopeBeneathTank();
+                    resolve();
+                },
+            });
+        });
+    }
+
     fallTo(pos: Victor | Point): Promise<void> {
+        const tankBody = this.tank.body.getGlobalPosition();
         const obj = {
-            x: this.tank.x + gameSettings.dirt.size,
-            y: this.tank.y + gameSettings.dirt.size,
+            x: tankBody.x + gameSettings.dirt.size,
+            y: tankBody.y + gameSettings.dirt.size,
             angle: this.tank.angle,
         };
         const dist = Math.abs(this.tank.y - pos.y);

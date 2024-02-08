@@ -2,11 +2,13 @@ import Singleton from '../../Utils/Singleton';
 import TankController from '../Tank/TankController';
 
 export enum EKeys {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT,
-    SPACE,
+    UP = 'ArrowUp',
+    DOWN = 'ArrowDown',
+    LEFT = 'ArrowLeft',
+    RIGHT = 'ArrowRight',
+    SPACE = ' ',
+    A = 'a',
+    D = 'd',
 }
 
 class MouseManager extends Singleton<MouseManager>() {
@@ -21,22 +23,27 @@ class MouseManager extends Singleton<MouseManager>() {
         this.pressedKeys.add(e.key);
         const amount = e.shiftKey ? 10 : 1;
         switch (e.key) {
-            case 'ArrowUp':
+            case EKeys.UP:
                 TankController.power += amount;
                 break;
-            case 'ArrowDown':
+            case EKeys.DOWN:
                 TankController.power -= amount;
                 break;
-            case 'ArrowLeft':
+            case EKeys.LEFT:
                 TankController.angle -= amount;
                 break;
-            case 'ArrowRight':
+            case EKeys.RIGHT:
                 TankController.angle += amount;
                 break;
-            case ' ':
+            case EKeys.SPACE:
                 TankController.fire();
                 break;
-
+            case EKeys.A:
+                TankController.moveTo('left');
+                break;
+            case EKeys.D:
+                TankController.moveTo('right');
+                break;
             default:
                 break;
         }

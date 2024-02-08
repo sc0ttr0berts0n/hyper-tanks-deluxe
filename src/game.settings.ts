@@ -21,6 +21,8 @@ export default {
     tank: {
         playerStartPos: 0.2, // as a float across the whole width
         size: new Victor(40, 20),
+        maxClimb: 50,
+        moveDistance: 125,
     },
     localStorageController: {
         namespace: 'HyperTanksGame',
