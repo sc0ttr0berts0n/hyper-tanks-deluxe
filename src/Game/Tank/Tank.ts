@@ -43,17 +43,17 @@ export class Tank extends Container {
         const startPos = DirtController.surfacePositionAt(this._opts.startPos);
         this.position.set(startPos.x, startPos.y);
 
+        // calc body angle
+        this.alignTankWithSurfaceSlope();
+
+        this.addChild(this._gfx_body);
+
         // place turret
         this.turret = this.addChild(new Turret(this, this._opts));
         this.turret.y = -this._gfx_body.height * 0.8;
 
         // place retricle
         this.turret.addChild(new Reticle(this));
-
-        // calc body angle
-        this.alignTankWithSurfaceSlope();
-
-        this.addChild(this._gfx_body);
     }
 
     getSlopeBeneathTank(): number {

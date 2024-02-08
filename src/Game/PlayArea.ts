@@ -16,7 +16,6 @@ export class PlayArea extends Container {
         super();
         Objects.set('PlayArea', this);
         this.addChild(this._gfx_background);
-        DirtController.init();
         this.addChild(DirtController.view);
         this.eventMode = 'static';
         this.addChild(new Tank({ color: 0xff5050 }));
@@ -25,13 +24,6 @@ export class PlayArea extends Container {
             this.eventMode = 'none';
             await TankController.fire();
             this.eventMode = 'static';
-            console.log('done');
-            // const radius = Math.floor(Math.random() * 8) * 16;
-            // const explosion = new Explosion({
-            //     pos: new Victor(e.screenX, e.screenY),
-            //     radius,
-            // });
-            // this.addChild(explosion);
         });
     }
 }

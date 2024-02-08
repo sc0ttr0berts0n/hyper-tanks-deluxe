@@ -6,6 +6,9 @@ import MouseManager from './Managers/MouseManager';
 import TankController from './Tank/TankController';
 import { UI } from './UI/UI';
 import KeyboardManager from './Managers/KeyboardManager';
+import DirtController from './Dirt/DirtController';
+import { Projectile } from './Projectile/Projectile';
+import Victor from 'victor';
 
 class Game extends Singleton<Game>() {
     public app: Application | undefined;
@@ -35,11 +38,20 @@ class Game extends Singleton<Game>() {
 
     async create() {
         // await GraphicController.init();
+        DirtController.init();
+        TankController.init();
+        KeyboardManager.init();
         this.playArea = this.app?.stage.addChild(new PlayArea());
         this.ui = this.app?.stage.addChild(new UI());
         MouseManager.init();
-        KeyboardManager.init();
-        TankController.init();
+        new Projectile({
+            startAngle: 0,
+            startPower: 0,
+            startPos: new Victor(
+                TankController.tank.x + 200,
+                TankController.tank.y + 200
+            ),
+        });
     }
 }
 

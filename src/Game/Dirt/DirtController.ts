@@ -90,6 +90,9 @@ class DirtController extends Singleton<DirtController>() {
         const promises: Promise<void>[] = [];
 
         for (let strip of this._strips) {
+            const tankPos = TankController.tank.body.getGlobalPosition();
+            const tankOnStrip = strip === this.stripAtPixel(tankPos.x);
+
             // detect an air gap
             let lowestAir = -1;
             let nextDirt = -1;
@@ -117,7 +120,7 @@ class DirtController extends Singleton<DirtController>() {
                 promises.push(
                     ...strip.dirt
                         .slice(0, nextDirt + 1)
-                        .map((dirt): Promise<void> => {
+                        .map((dirt, index): Promise<void> => {
                             const duration =
                                 Math.sqrt(
                                     (2 * (dist * particleSize)) / gravity
@@ -133,8 +136,20 @@ class DirtController extends Singleton<DirtController>() {
                                     y: obj.y + dist * particleSize,
                                     update: () => {
                                         dirt.y = obj.y;
+                                        if (tankOnStrip && index === 0) {
+                                            TankController.tank.y = dirt.y;
+                                            TankController.tank.body.angle =
+                                                TankController.tank.getSlopeBeneathTank();
+                                            console.log(
+                                                TankController.tank.body.angle
+                                            );
+                                        }
                                     },
                                     complete: () => {
+                                        console.log(
+                                            TankController.tank.body.angle
+                                        );
+
                                         resolve();
                                     },
                                 });
@@ -144,6 +159,7 @@ class DirtController extends Singleton<DirtController>() {
 
                 // remove air dirt particles
                 this.removeDirtRange(strip, nextDirt + 1, dist);
+
                 continue;
             }
 
@@ -151,8 +167,7 @@ class DirtController extends Singleton<DirtController>() {
                 this.removeDirtRange(strip, 0, lowestAir + 1);
             }
 
-            const tankPos = TankController.tank.body.getGlobalPosition();
-            if (strip === this.stripAtPixel(tankPos.x)) {
+            if (tankOnStrip) {
                 const highestDirt = Math.min(...strip.dirt.map((el) => el.y));
                 if (tankPos.y < highestDirt - gameSettings.dirt.size) {
                     TankController.fallTo(
